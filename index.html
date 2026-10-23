@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psychology Island｜心理學探索島</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont,
+                 "Noto Sans TC", Arial, sans-serif;
+    background: #faf5ee;
+    color: #594d48;
+}
+
+header {
+    text-align: center;
+    padding: 28px 16px 18px;
+    background: #faf5ee;
+}
+
+header h1 {
+    margin: 0;
+    font-size: clamp(25px, 4vw, 38px);
+    letter-spacing: 2px;
+}
+
+header p {
+    color: #96867c;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.subtitle {
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: #ba9683;
+    margin-bottom: 12px;
+}
+
+#scene {
+    width: 100%;
+    height: 490px;
+    position: relative;
+    background: #e4f0f2;
+    overflow: hidden;
+    touch-action: none;
+}
+
+#scene canvas {
+    display: block;
+}
+
+.scene-tip {
+    position: absolute;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,.9);
+    padding: 11px 20px;
+    border-radius: 30px;
+    font-size: 12px;
+    color: #786e68;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.section {
+    max-width: 950px;
+    margin: 35px auto;
+    padding: 0 20px;
+    text-align: center;
+}
+
+.section h2 {
+    font-size: 23px;
+    margin-bottom: 10px;
+}
+
+.section > p {
+    color: #95867d;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 26px;
+}
+
+.card {
+    background: white;
+    border: 1px solid #eee6df;
+    border-radius: 20px;
+    padding: 24px 16px;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s;
+    color: inherit;
+    font: inherit;
+    text-align: center;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px #66554415;
+}
+
+.card .icon {
+    font-size: 36px;
+    margin-bottom: 12px;
+}
+
+.card h3 {
+    font-size: 17px;
+    margin: 8px 0;
+}
+
+.card p {
+    font-size: 13px;
+    line-height: 1.7;
+    color: #94877e;
+}
+
+button {
+    cursor: pointer;
+}
+
+.primary {
+    border: 0;
+    border-radius: 30px;
+    padding: 12px 24px;
+    background: #c58e77;
+    color: white;
+    font-size: 14px;
+    margin-top: 12px;
+}
+
+.primary:hover {
+    background: #ae7863;
+}
+
+.secondary {
+    background: white;
+    border: 1px solid #d8c8bc;
+    border-radius: 25px;
+    padding: 10px 18px;
+    color: #806e64;
+    margin: 8px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(48,40,37,.55);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-box {
+    background: #fffaf5;
+    width: min(100%, 650px);
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 24px;
+    padding: 28px;
+    position: relative;
+    text-align: center;
+}
+
+.close {
+    position: absolute;
+    right: 18px;
+    top: 12px;
+    border: 0;
+    background: transparent;
+    font-size: 28px;
+    color: #8b7c72;
+}
+
+.modal-box h2 {
+    margin-top: 10px;
+}
+
+.modal-box p {
+    line-height: 1.9;
+    font-size: 14px;
+}
+
+.experiment {
+    margin: 22px 0;
+    padding: 24px 12px;
+    background: white;
+    border-radius: 15px;
+}
+
+.answer {
+    display: none;
+    background: #f1ebe4;
+    border-radius: 14px;
+    padding: 18px;
+    margin-top: 18px;
+    text-align: left;
+    font-size: 14px;
+    line-height: 1.9;
+}
+
+.answer.show {
+    display: block;
+}
+
+.choice {
+    background: white;
+    border: 1px solid #d9c9bd;
+    border-radius: 12px;
+    padding: 12px 20px;
+    margin: 6px;
+    font-size: 14px;
+    color: #594d48;
+}
+
+.choice:hover {
+    background: #f6e8dd;
+}
+
+.lines {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 10px;
+}
+
+.lines svg {
+    width: 46%;
+    max-width: 230px;
+    height: auto;
+}
+
+.color-demo {
+    display: flex;
+    width: 100%;
+    max-width: 430px;
+    margin: 15px auto;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.color-side {
+    flex: 1;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.color-center {
+    width: 70px;
+    height: 70px;
+    background: #999999;
+}
+
+footer {
+    text-align: center;
+    padding: 35px 15px;
+    font-size: 12px;
+    color: #a49589;
+}
+
+@media (max-width: 650px) {
+    #scene {
+        height: 380px;
+    }
+
+    .cards {
+        grid-template-columns: 1fr;
+    }
+
+    .scene-tip {
+        font-size: 10px;
+        padding: 9px 12px;
+    }
+
+    .modal-box {
+        padding: 22px 15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="subtitle">A LITTLE JOURNEY INTO YOUR MIND</div>
+    <h1>🏝️ 心理學探索島</h1>
+    <p>
+        歡迎來到 Psychology Island<br>
+        在這座小島上，發現眼睛與大腦之間的小祕密。
+    </p>
+</header>
+
+<div id="scene">
+    <div class="scene-tip">
+        🖱️ 拖曳旋轉・滾輪縮放・點擊建築物探索
+    </div>
+</div>
+
+<section class="section">
+    <h2>🧠 選擇你的探索目的地</h2>
+    <p>
+        我們真的看見了眼前的一切嗎？<br>
+        走進不同的心理學實驗，親自體驗知覺的奇妙。
+    </p>
+
+    <div class="cards">
+        <button class="card" onclick="openExperiment('illusion')">
+            <div class="icon">🏠</div>
+            <h3>錯覺小屋</h3>
+            <p>兩條一樣長的線，為什麼看起來不一樣？</p>
+            <span>探索視覺錯覺 →</span>
+        </button>
+
+        <button class="card" onclick="openExperiment('attention')">
+            <div class="icon">🎭</div>
+            <h3>注意力劇院</h3>
+            <p>當我們專注一件事，會忽略什麼？</p>
+            <span>挑戰注意力 →</span>
+        </button>
+
+        <button class="card" onclick="openExperiment('color')">
+            <div class="icon">🎨</div>
+            <h3>色彩研究所</h3>
+            <p>相同的顏色，在不同背景下也會改變嗎？</p>
+            <span>探索色彩知覺 →</span>
+        </button>
+    </div>
+</section>
+
+<div class="modal" id="modal" role="dialog"
+     aria-modal="true" aria-labelledby="modalTitle">
+
+    <div class="modal-box">
+        <button class="close" onclick="closeExperiment()"
+                aria-label="關閉">×</button>
+
+        <div id="experimentContent"></div>
+    </div>
+</div>
+
+<footer>
+    Psychology Island · 普通心理學互動式期末報告提案<br>
+    Made with curiosity & psychology ♡
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+
+<script>
+/* =========================================
+   第一部分：3D 心理學探索島
+========================================= */
+
+const container = document.getElementById("scene");
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xe4f0f2);
+
+const camera = new THREE.PerspectiveCamera(
+    45,
+    container.clientWidth / container.clientHeight,
+    0.1,
+    100
+);
+
+camera.position.set(9, 9, 13);
+camera.lookAt(0, 0, 0);
+
+const renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    alpha: false
+});
+
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(container.clientWidth, container.clientHeight);
+
+container.prepend(renderer.domElement);
+
+const islandGroup = new THREE.Group();
+scene.add(islandGroup);
+
+const clickable = [];
+
+/* 材質工具 */
+
+function material(color) {
+    return new THREE.MeshLambertMaterial({
+        color: color,
+        flatShading: true
+    });
+}
+
+/* 光線 */
+
+scene.add(new THREE.AmbientLight(0xffffff, 1.7));
+
+const sunlight = new THREE.DirectionalLight(0xffffff, 2);
+sunlight.position.set(5, 10, 8);
+scene.add(sunlight);
+
+/* 六角形土地 */
+
+const soil = new THREE.Mesh(
+    new THREE.CylinderGeometry(5, 4.5, 1.2, 6),
+    [
+        material(0xc49b78),
+        material(0x9fca92),
+        material(0xb88768)
+    ]
+);
+
+soil.position.y = -0.6;
+islandGroup.add(soil);
+
+/* 建立樹木 */
+
+function createTree(x, z, scale = 1) {
+    const tree = new THREE.Group();
+
+    const trunk = new THREE.Mesh(
+        new THREE.CylinderGeometry(.12, .17, .85, 7),
+        material(0xa77b5c)
+    );
+
+    trunk.position.y = .43;
+    tree.add(trunk);
+
+    const leaves1 = new THREE.Mesh(
+        new THREE.ConeGeometry(.65, 1.35, 7),
+        material(0x75a98a)
+    );
+
+    leaves1.position.y = 1.3;
+    tree.add(leaves1);
+
+    const leaves2 = new THREE.Mesh(
+        new THREE.ConeGeometry(.48, 1.05, 7),
+        material(0x5c987b)
+    );
+
+    leaves2.position.y = 1.95;
+    tree.add(leaves2);
+
+    tree.position.set(x, 0, z);
+    tree.scale.setScalar(scale);
+
+    islandGroup.add(tree);
+}
+
+createTree(-3.1, -1.2, .85);
+createTree(-3.4, 1.3, .75);
+createTree(3.3, -1.4, .85);
+createTree(3.3, 1.4, .7);
+createTree(-1.8, -3.0, .6);
+createTree(1.7, 3.1, .65);
+
+/* 步道 */
+
+function createPath(x, z, length, rotation = 0) {
+    const path = new THREE.Mesh(
+        new THREE.BoxGeometry(.55, .035, length),
+        material(0xe9d6b8)
+    );
+
+    path.position.set(x, .025, z);
+    path.rotation.y = rotation;
+    islandGroup.add(path);
+}
+
+createPath(0, 0, 5.5);
+createPath(-1.4, 0, 2.7, Math.PI / 2);
+createPath(1.4, 0, 2.7, Math.PI / 2);
+
+/* 建立房屋 */
+
+function createHouse(x, z, wallColor, roofColor, type) {
+    const house = new THREE.Group();
+
+    const walls = new THREE.Mesh(
+        new THREE.BoxGeometry(1.65, 1.35, 1.5),
+        material(wallColor)
+    );
+
+    walls.position.y = .7;
+    house.add(walls);
+
+    const roof = new THREE.Mesh(
+        new THREE.ConeGeometry(1.38, .9, 4),
+        material(roofColor)
+    );
+
+    roof.rotation.y = Math.PI / 4;
+    roof.position.y = 1.8;
+    house.add(roof);
+
+    const door = new THREE.Mesh(
+        new THREE.BoxGeometry(.42, .75, .055),
+        material(0x947866)
+    );
+
+    door.position.set(0, .39, .78);
+    house.add(door);
+
+    const windowMaterial = material(0xc2dce2);
+
+    const window1 = new THREE.Mesh(
+        new THREE.BoxGeometry(.32, .34, .055),
+        windowMaterial
+    );
+
+    window1.position.set(-.52, .95, .78);
+    house.add(window1);
+
+    const window2 = window1.clone();
+    window2.position.x = .52;
+    house.add(window2);
+
+    house.position.set(x, 0, z);
+
+    house.userData.type = type;
+
+    house.traverse(function(object) {
+        if (object.isMesh) {
+            object.userData.type = type;
+            clickable.push(object);
+        }
+    });
+
+    islandGroup.add(house);
+}
+
+createHouse(
+    -2.0, -.7,
+    0xffead8,
+    0xdca48c,
+    "illusion"
+);
+
+createHouse(
+    2.0, -.7,
+    0xf5e3ef,
+    0xb49acb,
+    "attention"
+);
+
+createHouse(
+    0, 2.3,
+    0xe5eee2,
+    0x86b5ad,
+    "color"
+);
+
+/* 花朵裝飾 */
+
+function createFlower(x, z, color) {
+    const flower = new THREE.Mesh(
+        new THREE.SphereGeometry(.11, 8, 6),
+        material(color)
+    );
+
+    flower.position.set(x, .13, z);
+    islandGroup.add(flower);
+}
+
+const flowerPositions = [
+    [-2.7, 2.2], [-2.4, 2.5],
+    [2.6, 2.5], [2.9, 2.2],
+    [-.7, -3.2], [.7, -3.1]
+];
+
+flowerPositions.forEach((p, i) => {
+    createFlower(
+        p[0],
+        p[1],
+        i % 2 === 0 ? 0xf3c0bb : 0xffe4a5
+    );
+});
+
+/* =========================================
+   第二部分：滑鼠旋轉與縮放
+========================================= */
+
+let dragging = false;
+let moved = false;
+let previousX = 0;
+let previousY = 0;
+
+let targetRotationX = .15;
+let targetRotationY = -.25;
+
+let zoom = 16;
+
+const canvas = renderer.domElement;
+
+canvas.addEventListener("pointerdown", e => {
+    dragging = true;
+    moved = false;
+    previousX = e.clientX;
+    previousY = e.clientY;
+    canvas.setPointerCapture(e.pointerId);
+});
+
+canvas.addEventListener("pointermove", e => {
+    if (!dragging) return;
+
+    const dx = e.clientX - previousX;
+    const dy = e.clientY - previousY;
+
+    if (Math.abs(dx) + Math.abs(dy) > 2) {
+        moved = true;
+    }
+
+    targetRotationY += dx * .006;
+    targetRotationX += dy * .004;
+
+    targetRotationX = Math.max(
+        -.25,
+        Math.min(.45, targetRotationX)
+    );
+
+    previousX = e.clientX;
+    previousY = e.clientY;
+});
+
+canvas.addEventListener("pointerup", e => {
+    dragging = false;
+
+    if (!moved) {
+        handleClick(e);
+    }
+});
+
+canvas.addEventListener("pointercancel", () => {
+    dragging = false;
+});
+
+canvas.addEventListener("wheel", e => {
+    e.preventDefault();
+
+    zoom += e.deltaY * .012;
+    zoom = Math.max(10, Math.min(23, zoom));
+
+}, { passive: false });
+
+/* 點擊建築物 */
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+function handleClick(event) {
+    const rect = canvas.getBoundingClientRect();
+
+    mouse.x =
+        ((event.clientX - rect.left) / rect.width) * 2 - 1;
+
+    mouse.y =
+        -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+
+    const intersects = raycaster.intersectObjects(
+        clickable,
+        false
+    );
+
+    if (intersects.length > 0) {
+        const type = intersects[0].object.userData.type;
+        openExperiment(type);
+    }
+}
+
+/* 動畫 */
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    if (!dragging) {
+        targetRotationY += .0012;
+    }
+
+    islandGroup.rotation.y +=
+        (targetRotationY - islandGroup.rotation.y) * .08;
+
+    islandGroup.rotation.x +=
+        (targetRotationX - islandGroup.rotation.x) * .08;
+
+    camera.position.set(
+        zoom * .48,
+        zoom * .52,
+        zoom * .72
+    );
+
+    camera.lookAt(0, 0, 0);
+
+    renderer.render(scene, camera);
+}
+
+animate();
+
+/* 視窗尺寸 */
+
+window.addEventListener("resize", () => {
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(width, height);
+});
+
+/* =========================================
+   第三部分：心理學互動實驗
+========================================= */
+
+const modal = document.getElementById("modal");
+const content = document.getElementById("experimentContent");
+
+function openExperiment(type) {
+    modal.classList.add("active");
+
+    if (type === "illusion") {
+        content.innerHTML = `
+            <h2 id="modalTitle">🏠 錯覺小屋</h2>
+
+            <p>
+                歡迎來到視覺錯覺實驗室！<br>
+                仔細觀察下面兩條線。
+            </p>
+
+            <div class="experiment">
+                <div class="lines">
+
+                    <svg viewBox="0 0 220 120"
+                         aria-label="A：兩端箭頭向內的線">
+                        <g stroke="#66574d"
+                           stroke-width="4"
+                           fill="none">
+                            <path d="M45 60 L175 60"/>
+                            <path d="M45 60 L65 40"/>
+                            <path d="M45 60 L65 80"/>
+                            <path d="M175 60 L155 40"/>
+                            <path d="M175 60 L155 80"/>
+                        </g>
+                        <text x="110" y="110"
+                              text-anchor="middle"
+                              fill="#66574d">A</text>
+                    </svg>
+
+                    <svg viewBox="0 0 220 120"
+                         aria-label="B：兩端箭頭向外的線">
+                        <g stroke="#66574d"
+                           stroke-width="4"
+                           fill="none">
+                            <path d="M45 60 L175 60"/>
+                            <path d="M45 60 L25 40"/>
+                            <path d="M45 60 L25 80"/>
+                            <path d="M175 60 L195 40"/>
+                            <path d="M175 60 L195 80"/>
+                        </g>
+                        <text x="110" y="110"
+                              text-anchor="middle"
+                              fill="#66574d">B</text>
+                    </svg>
+
+                </div>
+            </div>
+
+            <p><strong>你覺得哪條水平線比較長？</strong></p>
+
+            <button class="choice"
+                    onclick="reveal('illusionAnswer')">A 比較長</button>
+
+            <button class="choice"
+                    onclick="reveal('illusionAnswer')">B 比較長</button>
+
+            <button class="choice"
+                    onclick="reveal('illusionAnswer')">一樣長</button>
+
+            <div class="answer" id="illusionAnswer">
+                <strong>✨ 答案揭曉：兩條水平線一樣長！</strong>
+
+                <p>
+                    這是 Müller-Lyer illusion（穆勒－萊爾錯覺）。
+                    雖然兩條水平線的實際長度相同，
+                    但兩端箭頭的方向會影響我們對長度的判斷。
+                </p>
+
+                <p>
+                    這提醒我們：知覺並不只是被動接收刺激，
+                    大腦也會受到周圍視覺線索的影響。
+                </p>
+            </div>
+        `;
+    }
+
+    if (type === "attention") {
+        content.innerHTML = `
+            <h2 id="modalTitle">🎭 注意力劇院</h2>
+
+            <p>
+                我們每天接收到大量資訊，<br>
+                但注意力能同時處理所有事情嗎？
+            </p>
+
+            <div class="experiment">
+                <p style="font-size:40px">🔴 🔵 🟢 🟡 🟣</p>
+
+                <p>
+                    請仔細觀察這些顏色，<br>
+                    並回答下面的問題。
+                </p>
+            </div>
+
+            <p><strong>上方總共有幾個不同顏色的圓形？</strong></p>
+
+            <button class="choice"
+                    onclick="reveal('attentionAnswer')">4 個</button>
+
+            <button class="choice"
+                    onclick="reveal('attentionAnswer')">5 個</button>
+
+            <button class="choice"
+                    onclick="reveal('attentionAnswer')">6 個</button>
+
+            <div class="answer" id="attentionAnswer">
+                <strong>✨ 答案：5 個</strong>
+
+                <p>
+                    這是一個簡單的觀察暖身活動，
+                    並不能直接測量選擇性注意力。
+                </p>
+
+                <p>
+                    在正式的選擇性注意力研究中，
+                    研究者通常會要求參與者專注特定任務，
+                    再觀察他們是否忽略其他刺激。
+                </p>
+
+                <p>
+                    例如著名的「看不見的大猩猩」研究，
+                    就展示了注意力如何影響我們對事件的察覺。
+                </p>
+            </div>
+        `;
+    }
+
+    if (type === "color") {
+        content.innerHTML = `
+            <h2 id="modalTitle">🎨 色彩研究所</h2>
+
+            <p>
+                下面兩個灰色方塊，<br>
+                你覺得它們的顏色一樣嗎？
+            </p>
+
+            <div class="experiment">
+
+                <div class="color-demo">
+
+                    <div class="color-side"
+                         style="background:#333333">
+                        <div class="color-center"></div>
+                    </div>
+
+                    <div class="color-side"
+                         style="background:#eeeeee">
+                        <div class="color-center"></div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <button class="choice"
+                    onclick="reveal('colorAnswer')">左邊比較亮</button>
+
+            <button class="choice"
+                    onclick="reveal('colorAnswer')">右邊比較亮</button>
+
+            <button class="choice"
+                    onclick="reveal('colorAnswer')">完全一樣</button>
+
+            <div class="answer" id="colorAnswer">
+                <strong>✨ 答案：兩個灰色方塊完全相同！</strong>
+
+                <p>
+                    兩個中央方塊都使用相同的灰色，
+                    但因為周圍背景的明暗不同，
+                    我們可能會感覺它們的亮度不一樣。
+                </p>
+
+                <p>
+                    這種現象稱為同時明度對比
+                    （Simultaneous Brightness Contrast）。
+                </p>
+
+                <p>
+                    它說明我們對亮度的知覺，
+                    會受到周圍環境的影響。
+                </p>
+            </div>
+        `;
+    }
+
+    modal.querySelector(".close").focus();
+}
+
+function reveal(id) {
+    document.getElementById(id).classList.add("show");
+}
+
+function closeExperiment() {
+    modal.classList.remove("active");
+}
+
+modal.addEventListener("click", e => {
+    if (e.target === modal) {
+        closeExperiment();
+    }
+});
+
+document.addEventListener("keydown", e => {
+    if (e.key === "Escape") {
+        closeExperiment();
+    }
+});
+</script>
+
+</body>
+</html>
